@@ -1,97 +1,667 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login Page</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Portfolio | Your Name</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    body {
-      background: #f0f2f5;
-      display: flex;
-      height: 100vh;
-      justify-content: center;
-      align-items: center;
-    }
+  <!-- Font Awesome for map marker icon (optional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
-    .login-box {
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 350px;
-    }
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+  /* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 999;
+}
 
-    .login-box h2 {
-      margin-bottom: 20px;
-      text-align: center;
-      color: #333;
-    }
+/* Modal Container */
+.thank-you-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-    .login-box input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
+.thank-you-modal.active {
+  display: grid;
+}
 
-    .login-box button {
-      width: 100%;
-      padding: 12px;
-      background: #007bff;
-      border: none;
-      color: white;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  transform: scale(0.9);
+  opacity: 0;
+  animation: scaleIn 0.4s ease-out forwards;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
 
-    .login-box button:hover {
-      background: #0056b3;
-    }
+@keyframes scaleIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
-    .error {
-      color: red;
-      font-size: 14px;
-      text-align: center;
-      margin-top: 10px;
-    }
-  </style>
+/* Animated Checkmark */
+.checkmark {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+}
+
+.checkmark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.checkmark circle,
+.checkmark path {
+  stroke: #4CAF50;
+  stroke-width: 2;
+  fill: none;
+  stroke-dasharray: 157;
+  stroke-dashoffset: 157;
+}
+
+.checkmark.animate circle {
+  animation: draw-circle 0.6s ease forwards;
+}
+
+.checkmark.animate path {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: draw-check 0.4s 0.6s ease forwards;
+}
+
+@keyframes draw-circle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes draw-check {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Close Button */
+.close-modal {
+  margin-top: 20px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.close-modal:hover {
+  background-color: #45a049;
+}
+
+    </style>
 </head>
 <body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo" aria-label="Nahi Homepage">
+  <span class="logo__initial">N</span><span class="logo__rest">ahi.</span>
+</a>
+                <ul class="nav-links">
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="nav-btns">
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="hamburger" id="hamburger">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
 
-  <div class="login-box">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <div class="error" id="error-msg"></div>
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Hi, I'm <span>Nathan Temesgen</span></h1>
+                    <h2>FullStack Developer</h2>
+                    <p>I create beautiful, responsive websites with modern technologies. Passionate about user experience and clean code.</p>
+                    <div class="hero-btns">
+                        <a href="#projects" class="btn">View My Work</a>
+                        <a href="#contact" class="btn btn-outline">Contact Me</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="nat1.png" alt="Profile Image">
+                    <div class="hero-shape"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <div class="section-title">
+                <h2>About Me</h2>
+                <p>Get to know more about me and my skills</p>
+            </div>
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="nat1.png" alt="About Image">
+                </div>
+                <div class="about-text">
+                    <h3>Who I Am</h3>
+                    <p>👋 Hi there! I’m <span class="na">Nathan Temesgen</span>, a passionate Software Engineering student and Full-Stack Web Developer with a love for building functional, user-friendly, and scalable web applications.</p>
+                    <p>🔹 Frontend: React, JavaScript, HTML/CSS<br>
+🔹 Backend: Node.js, Python, Databases (SQL/NoSQL)<br>
+🔹 DevOps: Docker, Git, CI/CD</p>
+                    <div class="skills">
+                        <h4>My Skills</h4>
+                        <div class="skill-tags">
+                            <span class="skill-tag">HTML5</span>
+                            <span class="skill-tag">CSS3</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">PHP</span>
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">Git</span>
+                            <span class="skill-tag">Responsive Design</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <div class="container">
+            <div class="section-title">
+                <h2>My Projects</h2>
+                <p>Here are some of my recent works</p>
+            </div>
+            <div class="projects-filter">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="web">Web Design</button>
+                
+                <button class="filter-btn" data-filter="ui">UI/UX</button>
+            </div>
+            <div class="projects-grid">
+                <!-- Project 1 -->
+                <div class="project-card" data-category="web">
+                    <div class="project-image">
+                        <img src="https://via.placeholder.com/600x400" alt="Project 1">
+                        <span class="project-badge">Web Design</span>
+                    </div>
+                    <div class="project-info">
+                        <h3>E-commerce Website</h3>
+                        <p>A fully responsive e-commerce platform built with React and Node.js with payment integration.</p>
+                        <div class="project-links">
+                            <a href="#"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                            <a href="#"><span>📚</span> Description</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project 2 -->
+                <div class="project-card" data-category="web">
+                    <div class="project-image">
+                        <img src="https://via.placeholder.com/600x400" alt="Project 2">
+                        <span class="project-badge">Web Design</span>
+                    </div>
+                    <div class="project-info">
+                        <h3>Task Management App</h3>
+                        <p>A productivity application for managing tasks with drag-and-drop functionality and real-time updates.</p>
+                        <div class="project-links">
+                            <a href="#"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                            <a href="#"><span>📚</span> Description</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project 3 -->
+                <div class="project-card" data-category="ui">
+                    <div class="project-image">
+                        <img src="https://via.placeholder.com/600x400" alt="Project 3">
+                        <span class="project-badge">UI/UX</span>
+                    </div>
+                    <div class="project-info">
+                        <h3>Weather Dashboard</h3>
+                        <p>Real-time weather information with 5-day forecast using Weather API and interactive UI elements.</p>
+                        <div class="project-links">
+                            <a href="#"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                            <a href="#"><span>📚</span> Description</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2>Get In Touch</h2>
+                <p>Feel free to contact me for any questions or opportunities</p>
+            </div>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Contact Information</h3>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>Natitemesgen883@gmail.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+251-986-971-388</span>
+                        </div>
+                        <div class="contact-item map-item">
+                          <span><i class="fas fa-map-marker-alt"></i>
+                            Hossana, Ethiopia</span>
+                          
+                        </div>
+                    </div>
+                    <h3>Follow Me</h3>
+                    <div class="social-links">
+                        <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.twitter.com/Nahi60186/" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/natu12463/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="form" action="https://formspree.io/f/xjkryakl"
+  method="POST">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" name="name" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Your Email</label>
+                            <input type="email" name="email" id="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Your Message</label>
+                            <textarea name="message" id="message" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+       <div class="thank-you-modal">
+  <div class="modal-overlay"></div>
+  <div class="modal-content animated">
+    <div class="checkmark animate">
+      <svg viewBox="0 0 52 52">
+        <circle cx="26" cy="26" r="25" fill="none" />
+        <path fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+      </svg>
+    </div>
+    <h3>Thank You!</h3>
+    <p>Your message has been sent successfully. I'll get back to you soon.</p>
+    <button class="close-modal">Got it</button>
   </div>
+</div>
+
+
+    </section>
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#" class="footer-logo">Nahi<span>.</span></a>
+                <p class="footer-description">Creating beautiful digital experiences with clean code and modern design.</p>
+
+                <div class="footer-links-group">   
+                 <h4 class="footer-heading" style="padding-top: 40px;">Contact Info</h4>
+                    <ul class="footer-contact-info">
+                        <li><i class="fas fa-envelope"></i> Natitemesgen883@gmail.com</li>
+                        <li><i class="fas fa-phone"></i> +251-986-971-388</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Hossana, Ethiopia</li>
+                    </ul>
+                    </div>
+            </div>
+            
+            <div class="footer-links-container">
+                <div class="footer-links-group">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#hero"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#about"><i class="fas fa-chevron-right"></i> About</a></li>
+                        <li><a href="#projects"><i class="fas fa-chevron-right"></i> Projects</a></li>
+                        <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+                
+                
+            </div>
+            
+            <div class="footer-newsletter">
+                <h4 class="footer-heading">Newsletter</h4>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+                <div class="footer-social">
+                    <a href="#" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="#" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.twitter.com/Nahi60186/" aria-label="Twitter" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/natu12463/" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p class="copyright">&copy; <span id="year"></span> Nathan Temesgen. All rights reserved.</p>
+            <div class="footer-legal">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
 
   <script>
-    function login() {
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value.trim();
-      const errorMsg = document.getElementById('error-msg');
+  
 
-      if (user === '' || pass === '') {
-        errorMsg.textContent = 'Please fill in both fields.';
-      } else if (user === 'admin' && pass === '1234') {
-        alert('Login successful!');
-        errorMsg.textContent = '';
-      } else {
-        errorMsg.textContent = 'Invalid username or password.';
-      }
+    // Create a custom icon
+    const customIcon = L.divIcon({
+      html: '<i class="fas fa-map-marker-alt" style="color: #2563eb; font-size: 32px;"></i>',
+      className: 'custom-marker-icon',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32]
+    });
+
+    // Add marker with custom icon
+    L.marker(hossanaCoords, {
+      icon: customIcon
+    }).addTo(map)
+      .bindPopup('<b>Hossana, Ethiopia</b>')
+      .openPopup();
+
+    // Disable dragging on mobile devices
+    if (window.innerWidth <= 768) {
+      map.dragging.disable();
     }
-  </script>
+  });
+</script>
+    <script>
+        // Mobile Menu Toggle Fix
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.querySelector('.nav-links');
 
+hamburger.addEventListener('click', () => {
+  navLinks.classList.toggle('active');
+  hamburger.innerHTML = navLinks.classList.contains('active') 
+    ? '<i class="fas fa-times"></i>' 
+    : '<i class="fas fa-bars"></i>';
+});
+
+// Close menu when clicking links
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', () => {
+    navLinks.classList.remove('active');
+    hamburger.innerHTML = '<i class="fas fa-bars"></i>';
+  });
+});
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('form');
+  const thankYouModal = document.querySelector('.thank-you-modal');
+  const closeModalBtn = document.querySelector('.close-modal');
+
+  // Close modal
+  closeModalBtn.addEventListener('click', () => {
+    thankYouModal.classList.remove('active');
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    let isValid = true;
+
+    document.querySelectorAll('.form-group').forEach(group => {
+      group.classList.remove('error');
+    });
+
+    const name = document.getElementById('name');
+    const email = document.getElementById('email');
+    const message = document.getElementById('message');
+
+    const emailPattern = /^\S+@\S+\.\S+$/;
+
+    if (!name.value.trim()) {
+      name.closest('.form-group').classList.add('error');
+      isValid = false;
+    }
+
+    if (!email.value.trim() || !emailPattern.test(email.value)) {
+      email.closest('.form-group').classList.add('error');
+      isValid = false;
+    }
+
+    if (!message.value.trim()) {
+      message.closest('.form-group').classList.add('error');
+      isValid = false;
+    }
+
+    if (isValid) {
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          showThankYouModal();
+          form.reset();
+        } else {
+          showErrorModal("Oops! Something went wrong. Please try again later.");
+        }
+      })
+      .catch(() => {
+        showErrorModal("There was a problem submitting your form.");
+      });
+    }
+  });
+
+  function showThankYouModal() {
+    const checkmark = thankYouModal.querySelector('.checkmark');
+    checkmark.classList.remove('animate');
+    void checkmark.offsetWidth; // force reflow
+    checkmark.classList.add('animate');
+
+    thankYouModal.querySelector('h3').textContent = 'Thank You!';
+    thankYouModal.querySelector('p').textContent = "Your message has been sent successfully. I'll get back to you soon.";
+    checkmark.style.display = 'block';
+    thankYouModal.classList.add('active');
+  }
+
+  function showErrorModal(message) {
+    thankYouModal.querySelector('h3').textContent = 'Error';
+    thankYouModal.querySelector('p').textContent = message;
+    thankYouModal.querySelector('.checkmark').style.display = 'none';
+    thankYouModal.classList.add('active');
+
+    setTimeout(() => {
+      thankYouModal.querySelector('.checkmark').style.display = '';
+      thankYouModal.querySelector('h3').textContent = 'Thank You!';
+    }, 3000);
+  }
+});
+
+
+
+
+
+
+        // Dark/Light Mode Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        // Check for saved user preference
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme) {
+            body.classList.add(currentTheme);
+            updateIcon();
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark-mode' : '');
+            updateIcon();
+        });
+
+        function updateIcon() {
+            themeToggle.innerHTML = body.classList.contains('dark-mode') 
+                ? '<i class="fas fa-sun"></i>' 
+                : '<i class="fas fa-moon"></i>';
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        
+
+        // Scroll animation for header
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            } else {
+                header.style.boxShadow = 'none';
+            }
+        });
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('active');
+            } else {
+                backToTop.classList.remove('active');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Project filtering
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const projectCards = document.querySelectorAll('.project-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterBtns.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                const filter = btn.getAttribute('data-filter');
+                
+                projectCards.forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Animation on scroll
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.section-title, .about-content, .project-card, .contact-container');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (elementPosition < screenPosition) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        };
+
+        // Set initial state for elements to animate
+        document.querySelectorAll('.section-title, .about-content, .project-card, .contact-container').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        });
+
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+
+
+        // Update copyright year automatically
+document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
